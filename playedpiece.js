@@ -1,6 +1,5 @@
 class PlayedPiece {
-    constructor (cell, character){
-    this.cell = cell; 
-    this.character = character;   
+    constructor(cell) {
+      this.cell = cell;
     }
-}
+  }
