@@ -1,5 +1,3 @@
-//why is my X's & O's not printing and my current players not switching?
-
 class PlayedPiece {
   constructor(cell) {
     this.cell = cell;
@@ -9,24 +7,26 @@ class PlayedPiece {
 class Game {
   constructor() {
     this.currentPlayer = "X";
-    // places X's & O's within the board b/w ""
+    // places X's & O's within the board b/w "". An array within an array
     this.boardState = [
       ["", "", ""],
       ["", "", ""],
       ["", "", ""],
     ];
 
-    this.turns = []; //arr to hold all the turns
+    this.turns = []; //arr to hold all the turns from new PlayedPiece class
   }
-  // ["0", "0"]
+  
   addMove(cell) {
     const xCoord = cell[0];
     const yCoord = cell[1];
-    this.boardState[xCoord][yCoord] = this.currentPlayer;
+    this.boardState[xCoord][yCoord] = this.currentPlayer; // ["0", "0"]
 
     let newPlayedPiece = new PlayedPiece(cell);
     this.turns.push(newPlayedPiece);
-    this.currentPlayer = this.currentPlayer === "X" ? "O" : "X";
+    console.log(newPlayedPiece); //PlayedPiece {cell: Array(2)} cell: (2) ['0', '0']
+
+    this.currentPlayer = this.currentPlayer === "X" ? "O" : "X"; //switches current player 
   }
 }
 
@@ -49,32 +49,44 @@ let progressGame = new Game();
 
 startRestartBtn.addEventListener("click", clearBoard);
 
-
 for (let i = 0; i < cells.length; i++) {
-    cells[i].addEventListener("click", addPiece);
+  cells[i].addEventListener("click", addPiece);
 }
 
 function addPiece(event) {
   event.preventDefault();
 
   const element = event.currentTarget;
-  const cellCoordText = element.id; // ex:id ="00" string 
-  const cell = cellCoordText.split("");  //ex: ["0", "0"]; array
+  console.log(element); //<div id="00" class="cell"></div>
+  const cellIdText = element.id; 
+  console.log(cellIdText);// 00
 
-  if (progressGame.boardState[cell[0], cell[1]] !== "") {
-    progressGame.addMove(cell);
-    message.textContent = `${progressGame.currentPlayer}'s turn`; 
+  const cellArr = cellIdText.split(""); //ex: ["0", "0"]; array
+  console.log(cellArr);
+
+  if (progressGame.boardState[(cellArr[0], cellArr[1])] !== "") {
+    console.log(progressGame.boardState[(cellArr[0], cellArr[1])]); // printed ["X", "",""]
+
+    //print X or O to DOM 
+    element.textContent = progressGame.currentPlayer; 
+
+    progressGame.addMove(cellArr);
+    console.log(progressGame.boardState); // [Array(3), Array(3), Array(3)]
+
+    message.textContent = `${progressGame.currentPlayer}'s turn`; //Getting Nan???????????????????????????????????
+    console.log(progressGame.currentPlayer); // Got 0!yay!
   }
+
   if (checkWin(progressGame.addMove.currentPlayer)) {
     message.textContent = `Game over! ${progressGame.addMove.currentPlayer} wins!`;
   }
   if (checkTie(progressGame.addMove.currentPlayer)) {
     message.textContent = `Game is tied!`;
-    
   } else {
     let nextPlayer = progressGame.addMove.currentPlayer++;
     message.textContent = `${nextPlayer}'s turn.`;
-  } return;
+  }
+  return;
 }
 
 function checkWin(currentPlayer) {
@@ -105,5 +117,4 @@ function clearBoard() {
     cells[i].textContent = "";
   }
   message.textContent = `Player 1 (X's) turn!`;
-
 }
