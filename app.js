@@ -1,4 +1,34 @@
-import { Game } from "./gameboard";
+//why is my X's & O's not printing and my current players not switching?
+
+class PlayedPiece {
+  constructor(cell) {
+    this.cell = cell;
+  }
+}
+
+class Game {
+  constructor() {
+    this.currentPlayer = "X";
+    // places X's & O's within the board b/w ""
+    this.boardState = [
+      ["", "", ""],
+      ["", "", ""],
+      ["", "", ""],
+    ];
+
+    this.turns = []; //arr to hold all the turns
+  }
+  // ["0", "0"]
+  addMove(cell) {
+    const xCoord = cell[0];
+    const yCoord = cell[1];
+    this.boardState[xCoord][yCoord] = this.currentPlayer;
+
+    let newPlayedPiece = new PlayedPiece(cell);
+    this.turns.push(newPlayedPiece);
+    this.currentPlayer = this.currentPlayer === "X" ? "O" : "X";
+  }
+}
 
 const cells = document.getElementsByClassName("cell");
 const message = document.getElementById("message");
@@ -18,39 +48,42 @@ const winningCombinations = [
 let progressGame = new Game();
 
 startRestartBtn.addEventListener("click", clearBoard);
-cells.addEventListener("click", addPiece);
+
+
+for (let i = 0; i < cells.length; i++) {
+    cells[i].addEventListener("click", addPiece);
+}
 
 function addPiece(event) {
   event.preventDefault();
 
   const element = event.currentTarget;
-  const cellCoordText = element.id;
-  const cell = cellCoordText.split("");
+  const cellCoordText = element.id; // ex:id ="00" string 
+  const cell = cellCoordText.split("");  //ex: ["0", "0"]; array
 
-  if (cell !== boardState[xCoord][yCoord]) {
+  if (progressGame.boardState[cell[0], cell[1]] !== "") {
     progressGame.addMove(cell);
-    cellCoordText.textContent = `${currentPlayer.value}`;
+    message.textContent = `${progressGame.currentPlayer}'s turn`; 
   }
-  if (checkWin(currentPlayer)) {
-    message.textContent = `Game over! ${currentPlayer} wins!`;
-    return;
+  if (checkWin(progressGame.addMove.currentPlayer)) {
+    message.textContent = `Game over! ${progressGame.addMove.currentPlayer} wins!`;
   }
-  if (checkTie()) {
+  if (checkTie(progressGame.addMove.currentPlayer)) {
     message.textContent = `Game is tied!`;
-    return;
+    
   } else {
-    let nextPlayers = curentPlayer++;
-    message.textContent = `${nextPlayers}'s turn.`;
-  }
+    let nextPlayer = progressGame.addMove.currentPlayer++;
+    message.textContent = `${nextPlayer}'s turn.`;
+  } return;
 }
 
 function checkWin(currentPlayer) {
   for (let i = 0; i < winningCombinations.length; i++) {
     const [a, b, c] = winningCombinations[i];
     if (
-      squares[a].textContent === currentPlayer &&
-      squares[b].textContent === currentPlayer &&
-      squares[c].textContent === currentPlayer
+      cells[a].textContent === currentPlayer &&
+      cells[b].textContent === currentPlayer &&
+      cells[c].textContent === currentPlayer
     ) {
       return true;
     }
@@ -72,4 +105,5 @@ function clearBoard() {
     cells[i].textContent = "";
   }
   message.textContent = `Player 1 (X's) turn!`;
+
 }

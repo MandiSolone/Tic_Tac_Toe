@@ -1,6 +1,10 @@
-import { PlayedPiece } from './playedpiece'
+export class PlayedPiece {
+    constructor(cell) {
+      this.cell = cell;
+    }
+  }
 
-class Game {
+export class Game {
     constructor() {
       this.currentPlayer = "X";
       this.boardState = [
