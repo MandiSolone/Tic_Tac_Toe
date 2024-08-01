@@ -1,4 +1,4 @@
-//win not working 
+//win not working// I don't think the boardState is being filled at all. Should be X & O correct? or ["0", "0"]?
 
 class PlayedPiece {
   constructor(cell) {
@@ -7,13 +7,19 @@ class PlayedPiece {
 }
 
 class Game {
-
   constructor() {
     this.message = document.getElementById("message");
     this.cells = document.getElementsByClassName("cell");
 
     this.currentPlayer = "X";
+
+
     // places X's & O's within the board b/w "". An array within an array
+    //3) [Array(3), Array(3), Array(3)]
+    // 0 : (3) ['X', 'O', 'X']
+    // 1 : (3) ['O', 'X', 'O']
+    // 2 : (3) ['X', 'O', 'X']
+    // length: 3
     this.boardState = [
       ["", "", ""],
       ["", "", ""],
@@ -24,70 +30,65 @@ class Game {
   }
 
   handleClick(event) {
-    event.preventDefault();
-  
-    const element = event.currentTarget;
-    console.log(element); //<div id="00" class="cell"></div>
-    const cellIdText = element.id; 
-    console.log(cellIdText);// 00
-  
-    const cellArr = cellIdText
-      .split("")
-      .map(item => parseInt(item)); //ex: ["0", "0"]; array
-    console.log(cellArr);
-  
-    if (this.boardState[cellArr[0]][cellArr[1]] !== "") {
-      // prevent piece from being added
+    if (!this.checkWin()) {
+      event.preventDefault();
+
+      const element = event.currentTarget; //<div id="00" class="cell"></div>
+      const cellIdText = element.id; // 00  (number)
+      const cellArr = cellIdText
+        .split("") // ["0", "0"]; string
+        .map((item) => parseInt(item)); //[0, 0]; numbers
+
+      if (this.boardState[cellArr[0]][cellArr[1]] !== "") {
+        // prevent piece from being added if cell already used
+        return;
+      }
+
+      element.textContent = this.currentPlayer; //print X or O into cell on DOM
+      this.addMove(cellArr); //[0, 0]; numbers placed into addMove function
+      this.message.textContent = `${this.currentPlayer}'s turn`;
+      console.log("checkWin: " + this.checkWin());
+      console.log("checkTie: " + this.checkTie());
+
+      if (this.checkWin()) {
+        this.message.textContent = `Game over! ${this.currentPlayer === "X" ? "O" : "X"} wins!`;
+      }
+      if (this.checkTie()) {
+        this.message.textContent = `Game is tied!`;
+      }
       return;
     }
-  
-    console.log(this.boardState[cellArr[0]][cellArr[1]]); // printed ["X", "",""]
-  
-    //print X or O to DOM 
-    element.textContent = this.currentPlayer; 
-  
-    this.addMove(cellArr);
-    console.log(this.boardState); // [Array(3), Array(3), Array(3)]
-  
-    this.message.textContent = `${this.currentPlayer}'s turn`; //Getting Nan???????????????????????????????????
-    console.log(this.currentPlayer); // Got 0!yay!
-    
-  
-    if (this.checkWin()) {
-      this.message.textContent = `Game over! ${this.addMove.currentPlayer} wins!`;
-    }
-    if (this.checkTie(this.addMove.currentPlayer)) {
-      this.message.textContent = `Game is tied!`;
-    } else {
-      let nextPlayer = this.addMove.currentPlayer++;
-      this.message.textContent = `${nextPlayer}'s turn.`;
-    }
-    return;
   }
-  
+
   addMove(cell) {
-    const xCoord = cell[0];
-    const yCoord = cell[1];
-    this.boardState[xCoord][yCoord] = this.currentPlayer; // ["0", "0"]
+    const xCoord = cell[0]; // starts as [2, 2] from cellArr, these const break it, so this is-  2
+    const yCoord = cell[1]; // 2
+    this.boardState[xCoord][yCoord] = this.currentPlayer; //this.boardState[2][2]. prints X or O to boardState position - Ex: ["X", "",""]
 
     let newPlayedPiece = new PlayedPiece(cell);
-    this.turns.push(newPlayedPiece);
-    console.log(newPlayedPiece); //PlayedPiece {cell: Array(2)} cell: (2) ['0', '0']
-
-    this.currentPlayer = this.currentPlayer === "X" ? "O" : "X"; //switches current player 
+    this.turns.push(newPlayedPiece); // returns array - PlayedPiece {cell: Array(2)} cell: (2) ['0', '0']
+    this.currentPlayer = this.currentPlayer === "X" ? "O" : "X"; //switches current player
   }
 
+  //if a = zero getCell(0) = [0, 0]// ex2 with a = 4 you'd get [1, 1], which matches and is dead cell 11 on the gameboard
   getCell(cellIndex) {
     if (cellIndex <= 2) {
-      return [0, cellIndex];
+      return [0, cellIndex]; // so [0, 0 or 1 or 2] which is the whole top row of the boardState
     } else if (cellIndex <= 5) {
-      return [1, cellIndex - 3];
+      return [1, cellIndex - 3]; //so [1, 2 or 1, or 0] which is the whol 2nd row of the boardState
     } else {
-      return [2, cellIndex - 6];
+      return [2, cellIndex - 6]; //so [2, 2 or 1 or 0] which is the whole 3rd row of the boardState
     }
   }
 
-  checkWin(player) {
+  // I want to compare the justPlayed Character (say X (string value); against my already placed spots (so, boardState or DOM elements); and check to see if there are any winningcombination matches. //************************ Compare winingcombos to my DOM element string text and the justPlayedCharacter string text (ex: X === X ). Need to iterate over the cells to get just the text piece.
+
+  checkWin() {
+    const justPlayedCharacter = this.currentPlayer === "X" ? "O" : "X"; //matches the player who just went X or O
+    console.log("A");
+    console.log("this.boardState", this.boardState);
+    console.log(this.justPlayedCharacter)
+    
     const winningCombinations = [
       [0, 1, 2],
       [3, 4, 5],
@@ -98,21 +99,45 @@ class Game {
       [0, 4, 8],
       [2, 4, 6],
     ];
-
     for (let i = 0; i < winningCombinations.length; i++) {
-      const [a, b, c] = winningCombinations[i];
-      const cellA = this.getCell(a);
+      const [a, b, c] = winningCombinations[i]; //ex [0, 4, 8]//ex2 if a = 4 (so center box of tic-tac-toe)
+      console.log([a, b, c]);
+      console.log(a);
+      console.log(b);
+      console.log(c);
+      console.log("winningCombinations", winningCombinations)
+
+      const cellA = this.getCell(a); // "a" is position of const [a, b, c] above. //ex2 = [1, 1]
       const cellB = this.getCell(b);
       const cellC = this.getCell(c);
+      console.log("cellA[0]", cellA[0]);
+      console.log("cellA[1]", cellA[1]);
+      console.log("this.boardState[0]", this.boardState[1]);
+      console.log("this.boardState[0,0]", this.boardState[0,0]);
+      console.log("this.boardState[0,0][0]", this.boardState[0,0][0]);
+      console.log("this.boardState[0][0]", this.boardState[0][0]);
+
+
+      console.log("cellA", cellA);
+      console.log("cellB", cellB);
+      console.log("cellC", cellC);
+      console.log("this.boardState[cellA[0]][cellA[1]]", this.boardState[cellA[0]][cellA[1]]);
+      console.log("this.boardState[cellB[0]][cellB[1]]", this.boardState[cellB[0]][cellB[1]]);
+      console.log("this.boardState[cellC[0]][cellC[1]]", this.boardState[cellC[0]][cellC[1]]);
+      console.log("justPlayedCharacter", this.justPlayedCharacter);
+      // console.log("this.boardState[cellA][i]", this.boardState[cellA][i]);
 
       if (
-        this.boardState[cellA[0]][cellA[1]] === player &&
-        this.boardState[cellB[0]][cellB[1]] === player &&
-        this.boardState[cellC[0]][cellC[1]] === player
+        //this.boardState[cellA[0]][cellA[1]]. Ex2 [1, 1] = this.boardState[1][1]
+        this.boardState[cellA[0]][cellA[1]] === justPlayedCharacter &&
+        this.boardState[cellB[0]][cellB[1]] === justPlayedCharacter &&
+        this.boardState[cellC[0]][cellC[1]] === justPlayedCharacter
       ) {
+        console.log("ITS TRUE")
         return true;
-      }
+      } 
     }
+    console.log("D");
     return false;
   }
 
@@ -132,7 +157,7 @@ class Game {
       ["", "", ""],
     ];
 
-    this.currentPlayer = 'X';
+    this.currentPlayer = "X";
     this.turns = [];
 
     for (let i = 0; i < this.cells.length; i++) {
@@ -145,8 +170,12 @@ class Game {
 let progressGame = new Game();
 const startRestartBtn = document.getElementById("btn");
 
-startRestartBtn.addEventListener("click", event => progressGame.clearBoard(event));
+startRestartBtn.addEventListener("click", (event) =>
+  progressGame.clearBoard(event)
+);
 
 for (let i = 0; i < progressGame.cells.length; i++) {
-  progressGame.cells[i].addEventListener("click", event => progressGame.handleClick(event));
+  progressGame.cells[i].addEventListener("click", (event) =>
+    progressGame.handleClick(event)
+  );
 }
