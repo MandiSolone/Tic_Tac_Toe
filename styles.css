@@ -14,38 +14,76 @@ body {
   margin: 0;
   width: 100vw;
   min-height: 100vh;
-  background-color: rgb(182, 212, 202);
+  background-color: rgb(184, 204, 219);
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column; /* Align content vertically */
+  gap: 20px; /* Add some space between elements */
 }
 
 .row {
   display: flex;
 }
+
 .cell {
-  border: solid black;
-  width: 150px;
-  height: 150px;
+  border: 2px solid #333;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 2rem;
   text-align: center;
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.cell:hover {
+  background-color: #d3e4f1; /* Subtle hover background */
+}
+
+@media (max-width: 768px) {
+  .cell {
+    width: 90px;
+    height: 90px;
+    font-size: 1.5rem; /* Responsive font size */
+  }
 }
 
 #btn {
-  margin-bottom: 10px;
-  padding: 0.5rem 0.75rem;
+  margin-bottom: 20px;
+  padding: 0.75rem 1rem;
   border: none;
   border-radius: 0.5rem;
-  color: black;
-  background-color: darkcyan;
+  color: rgb(12, 11, 11);
+  background-color: rgb(74, 162, 162);
   cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #btn:hover {
   background-color: #000000;
   color: darkcyan;
+}
+
+#board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+@media (max-width: 480px) {
+  .cell {
+    width: 80px;
+    height: 80px;
+    font-size: 1.2rem; /* Smaller font size for mobile */
+  }
+
+  #btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
 }
